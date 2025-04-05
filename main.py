@@ -7,7 +7,7 @@ from sqlmodel import create_engine, Session, text
 from sqlalchemy.engine import Engine
 from mcp.server.fastmcp import FastMCP, Context
 from dotenv import load_dotenv
-from sqlalchemy import inspect
+from sqlalchemy import inspect, Result
 
 load_dotenv()
 
@@ -29,20 +29,12 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
     engine = create_engine(DATABASE_URL, echo=False)
 
     try:
-        with Session(engine) as session:
-            session.execute(text("SELECT 1"))
-    except Exception as e:
-        raise RuntimeError(
-            f"无法连接到数据库，请检查 DATABASE_URL 和数据库状态: {e}"
-        ) from e
-
-    try:
         yield AppContext(engine=engine)
     finally:
         engine.dispose()
 
 
-mcp = FastMCP("PostgreSQL Schema Explorer", lifespan=app_lifespan)
+mcp = FastMCP("PostgreSQL Explorer", lifespan=app_lifespan)
 
 
 @mcp.tool()
@@ -59,7 +51,7 @@ def get_schema_names(ctx: Context) -> str:
 
 
 @mcp.tool()
-def get_tables_in_schema(ctx: Context, schema_name: Optional[str] = "public") -> str:
+def get_tables(ctx: Context, schema_name: Optional[str] = "public") -> str:
     """Get all tables in a schema.
 
     Args:
@@ -113,6 +105,7 @@ def get_columns(ctx: Context, table: str, schema_name: Optional[str] = "public")
     except Exception as e:
         return f"查询表时发生错误: {str(e)}"
 
+
 @mcp.tool()
 def get_indexes(ctx: Context, table: str, schema_name: Optional[str] = "public") -> str:
     """Get all indexes in a table.
@@ -134,6 +127,22 @@ def get_indexes(ctx: Context, table: str, schema_name: Optional[str] = "public")
 
     except Exception as e:
         return f"查询表时发生错误: {str(e)}"
+
+
+@mcp.tool()
+def run_dql_query(ctx: Context, raw_sql_query: str) -> str:
+    """Run a raw DQL SQL query, like SELECT, SHOW, DESCRIBE, EXPLAIN, etc.
+
+    Args:
+        raw_sql_query: The raw SQL query to run.
+    """
+    engine = ctx.request_context.lifespan_context.engine
+    with Session(engine) as session:
+        raw_sql_select = text(raw_sql_query)
+        result: Result = session.execute(raw_sql_select)
+        rows = result.fetchall()
+        return str(rows)
+
 
 if __name__ == "__main__":
     mcp.run()

@@ -1,1 +1,0 @@
-[{'name': 'email_unique_key', 'unique': True, 'column_names': ['email'], 'duplicates_constraint': 'email_unique_key', 'include_columns': [], 'dialect_options': {'postgresql_include': []}}, {'name': 'ix_user_dsid', 'unique': False, 'column_names': ['dsid'], 'include_columns': [], 'dialect_options': {'postgresql_include': []}}]
