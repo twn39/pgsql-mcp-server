@@ -1,5 +1,6 @@
 import os
 from contextlib import asynccontextmanager
+from textwrap import dedent
 from typing import AsyncIterator, Optional
 from dataclasses import dataclass
 from sqlmodel import create_engine, Session, text
@@ -43,6 +44,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
 
 mcp = FastMCP("PostgreSQL Schema Explorer", lifespan=app_lifespan)
 
+
 @mcp.tool()
 def get_schema_names(ctx: Context) -> str:
     """Get all schema names."""
@@ -75,9 +77,63 @@ def get_tables_in_schema(ctx: Context, schema_name: Optional[str] = "public") ->
             return f"No tables found in schema {schema_name}."
 
     except Exception as e:
-        error_message = f"查询表时发生错误: {str(e)}"
-        return error_message
+        return f"查询表时发生错误: {str(e)}"
 
+
+@mcp.tool()
+def get_columns(ctx: Context, table: str, schema_name: Optional[str] = "public") -> str:
+    """Get all columns in a table.
+
+    Args:
+        table: The name of the table to get columns from.
+        schema_name: The name of the schema to get columns from, defaults to "public".
+    """
+    try:
+        schema_name = schema_name or "public"
+        engine = ctx.request_context.lifespan_context.engine
+        inspector = inspect(engine)
+        columns = inspector.get_columns(table, schema=schema_name)
+
+        if not columns:
+            return "No columns found in table."
+        else:
+            result = []
+            for column in columns:
+                col = dedent(f"""\
+                column_name: {column["name"]}
+                type: {column["type"]}
+                nullable: {column["nullable"]}
+                default: {column.get("default")}
+                autoincrement: {column.get("autoincrement")} 
+                comment: {column.get("comment")} \
+                """)
+                result.append(col)
+            return "\n\n".join(result)
+
+    except Exception as e:
+        return f"查询表时发生错误: {str(e)}"
+
+@mcp.tool()
+def get_indexes(ctx: Context, table: str, schema_name: Optional[str] = "public") -> str:
+    """Get all indexes in a table.
+
+    Args:
+        table: The name of the table to get indexes from.
+        schema_name: The name of the schema to get indexes from, defaults to "public".
+    """
+    try:
+        schema_name = schema_name or "public"
+        engine = ctx.request_context.lifespan_context.engine
+        inspector = inspect(engine)
+        indexes = inspector.get_indexes(table, schema=schema_name)
+
+        if not indexes:
+            return "No indexes found in table."
+        else:
+            return str(indexes)
+
+    except Exception as e:
+        return f"查询表时发生错误: {str(e)}"
 
 if __name__ == "__main__":
     mcp.run()
