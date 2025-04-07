@@ -144,5 +144,8 @@ def run_dql_query(ctx: Context, raw_sql_query: str) -> str:
         return str(rows)
 
 
-if __name__ == "__main__":
+def serve():
     mcp.run()
+
+if __name__ == "__main__":
+    serve()
