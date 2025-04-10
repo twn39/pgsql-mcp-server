@@ -1,10 +1,10 @@
 [project]
 name = "pgsql-mcp-server"
-version = "1.0.0"
+version = "1.0.1"
 description = "PostgreSQL MCP Server"
 readme = "README.md"
 requires-python = ">=3.12"
-keywords = ["git", "ai", "aigit"]
+keywords = ["ai", "mcp", "postgresql", "pgsql", "mcp-server", "pgsql-mcp-server"]
 
 authors = [
     { name = "curry tang", email = "twn39@163.com" }
