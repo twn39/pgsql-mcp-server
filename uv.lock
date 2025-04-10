@@ -194,6 +194,7 @@ name = "pgsql-mcp-server"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "click" },
     { name = "httpx" },
     { name = "mcp", extra = ["cli"] },
     { name = "psycopg2-binary" },
@@ -203,6 +204,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "click", specifier = ">=8.1.8" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "mcp", extras = ["cli"], specifier = ">=1.6.0" },
     { name = "psycopg2-binary", specifier = ">=2.9.10" },

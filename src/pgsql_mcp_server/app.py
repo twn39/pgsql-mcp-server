@@ -3,20 +3,11 @@ from contextlib import asynccontextmanager
 from textwrap import dedent
 from typing import AsyncIterator, Optional
 from dataclasses import dataclass
+import click
 from sqlmodel import create_engine, Session, text
 from sqlalchemy.engine import Engine
 from mcp.server.fastmcp import FastMCP, Context
-from dotenv import load_dotenv
 from sqlalchemy import inspect, Result
-
-load_dotenv()
-
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-if not DATABASE_URL:
-    raise ValueError(
-        "错误：请设置 DATABASE_URL 环境变量。格式：postgresql+psycopg2://user:password@host:port/database"
-    )
 
 
 @dataclass
@@ -26,7 +17,8 @@ class AppContext:
 
 @asynccontextmanager
 async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
-    engine = create_engine(DATABASE_URL, echo=False)
+    _dsn = os.getenv("DATABASE_URL")
+    engine = create_engine(_dsn, echo=False)
 
     try:
         yield AppContext(engine=engine)
@@ -144,7 +136,11 @@ def run_dql_query(ctx: Context, raw_sql_query: str) -> str:
         return str(rows)
 
 
-def serve():
+@click.command()
+@click.option("--dsn", "-d", type=str, help="Database connection string")
+@click.option("-v", "--verbose", count=True)
+def serve(dsn: str, verbose: bool):
+    os.environ["DATABASE_URL"] = dsn
     mcp.run()
 
 if __name__ == "__main__":
