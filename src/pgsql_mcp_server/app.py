@@ -20,8 +20,8 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
     _dsn = os.getenv("DATABASE_URL")
     if not _dsn:
         raise ValueError("DATABASE_URL environment variable not set.")
-    if "+asyncpg" not in _dsn:
-        print(f"Warning: DATABASE_URL ('{_dsn}') does not seem to use an async driver (e.g., postgresql+asyncpg). Ensure it's correct.")
+    if _dsn.startswith("postgresql://"):
+        _dsn = _dsn.replace("postgresql://", "postgresql+asyncpg://", 1)
 
     engine = create_async_engine(_dsn, echo=False)
 
