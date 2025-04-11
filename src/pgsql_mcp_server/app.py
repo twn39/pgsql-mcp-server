@@ -1,6 +1,5 @@
 import os
 import click
-from textwrap import dedent
 from dataclasses import dataclass
 from sqlalchemy.engine import Engine
 from mcp.server.fastmcp import FastMCP, Context
@@ -27,7 +26,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
         engine.dispose()
 
 
-mcp = FastMCP("PostgreSQL Explorer", lifespan=app_lifespan)
+mcp = FastMCP("PgSQL MCP Server", lifespan=app_lifespan)
 
 
 @mcp.tool()
@@ -62,7 +61,7 @@ def get_tables(ctx: Context, schema_name: Optional[str] = "public") -> str:
             return f"No tables found in schema {schema_name}."
 
     except Exception as e:
-        return f"查询表时发生错误: {str(e)}"
+        return f"Error occurred while querying table: {str(e)}"
 
 
 @mcp.tool()
@@ -85,7 +84,7 @@ def get_columns(ctx: Context, table: str, schema_name: Optional[str] = "public")
             return str(columns)
 
     except Exception as e:
-        return f"查询表时发生错误: {str(e)}"
+        return f"Error occurred while querying table: {str(e)}"
 
 
 @mcp.tool()
@@ -108,7 +107,7 @@ def get_indexes(ctx: Context, table: str, schema_name: Optional[str] = "public")
             return str(indexes)
 
     except Exception as e:
-        return f"查询表时发生错误: {str(e)}"
+        return f"Error occurred while querying table: {str(e)}"
 
 
 @mcp.tool()
@@ -136,14 +135,14 @@ def run_ddl_query(ctx: Context, raw_ddl_sql: str) -> str:
     with Session(engine) as session:
         try:
             session.execute(text(raw_ddl_sql))
-            session.commit()  # 提交事务以使 DDL 生效
-            return "DDL 查询成功执行。"
+            session.commit()
+            return "DDL query executed successfully."
         except SQLAlchemyError as e:
-            session.rollback()  # 回滚事务
-            return f"执行 DDL 查询时发生错误: {str(e)}"
+            session.rollback()
+            return f"Error occurred while executing DDL query: {str(e)}"
         except Exception as e:
             session.rollback()
-            return f"执行 DDL 查询时发生意外错误: {str(e)}"
+            return f"Unexpected error occurred while executing DDL query: {str(e)}"
 
 
 @mcp.tool()
@@ -156,15 +155,14 @@ def run_dml_query(ctx: Context, raw_dml_sql: str) -> str:
     with Session(engine) as session:
         try:
             result = session.execute(text(raw_dml_sql))
-            session.commit()  # 提交事务以保存更改
-            # 返回受影响的行数
-            return f"DML 查询成功执行。影响行数: {result.rowcount}"
+            session.commit()  # Commit transaction to save changes
+            return f"DML query executed successfully. Affected rows: {result.rowcount}"
         except SQLAlchemyError as e:
-            session.rollback()  # 回滚事务
-            return f"执行 DML 查询时发生错误: {str(e)}"
+            session.rollback()
+            return f"Error occurred while executing DML query: {str(e)}"
         except Exception as e:
             session.rollback()
-            return f"执行 DML 查询时发生意外错误: {str(e)}"
+            return f"Unexpected error occurred while executing DML query: {str(e)}"
 
 
 @mcp.tool()
@@ -177,14 +175,14 @@ def run_dcl_query(ctx: Context, raw_dcl_sql: str) -> str:
     with Session(engine) as session:
         try:
             session.execute(text(raw_dcl_sql))
-            session.commit()  # 提交事务以使权限更改生效
-            return "DCL 查询成功执行。"
+            session.commit()
+            return "DCL query executed successfully."
         except SQLAlchemyError as e:
-            session.rollback()  # 回滚事务
-            return f"执行 DCL 查询时发生错误: {str(e)}"
+            session.rollback()
+            return f"Error occurred while executing DCL query: {str(e)}"
         except Exception as e:
             session.rollback()
-            return f"执行 DCL 查询时发生意外错误: {str(e)}"
+            return f"Unexpected error occurred while executing DCL query: {str(e)}"
 
 
 @click.command()
