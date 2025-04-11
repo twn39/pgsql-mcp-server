@@ -1,7 +1,7 @@
 
 ## Run MCP Server
 
-![PyPI - Version](https://img.shields.io/pypi/v/pgsql-mcp-server)
+[![PyPI - Version](https://img.shields.io/pypi/v/pgsql-mcp-server)](https://pypi.org/project/pgsql-mcp-server/)
 
 
 ```shell
