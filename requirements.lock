@@ -17,6 +17,8 @@ anyio==4.9.0
     # via mcp
     # via sse-starlette
     # via starlette
+asyncpg==0.30.0
+    # via pgsql-mcp-server
 certifi==2025.1.31
     # via httpcore
     # via httpx
@@ -24,6 +26,8 @@ click==8.1.8
     # via pgsql-mcp-server
     # via typer
     # via uvicorn
+greenlet==3.1.1
+    # via pgsql-mcp-server
 h11==0.14.0
     # via httpcore
     # via uvicorn

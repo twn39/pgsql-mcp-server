@@ -1,49 +1,56 @@
 import os
 import click
 from dataclasses import dataclass
-from sqlalchemy.engine import Engine
 from mcp.server.fastmcp import FastMCP, Context
 from typing import AsyncIterator, Optional
 from contextlib import asynccontextmanager
 from sqlalchemy.exc import SQLAlchemyError
-from sqlmodel import create_engine, Session, text
+from sqlmodel import text
 from sqlalchemy import inspect, Result
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine, AsyncSession
 
 
 @dataclass
 class AppContext:
-    engine: Engine
+    engine: AsyncEngine
 
 
 @asynccontextmanager
 async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
     _dsn = os.getenv("DATABASE_URL")
-    engine = create_engine(_dsn, echo=False)
+    if not _dsn:
+        raise ValueError("DATABASE_URL environment variable not set.")
+    if "+asyncpg" not in _dsn:
+        print(f"Warning: DATABASE_URL ('{_dsn}') does not seem to use an async driver (e.g., postgresql+asyncpg). Ensure it's correct.")
+
+    engine = create_async_engine(_dsn, echo=False)
 
     try:
         yield AppContext(engine=engine)
     finally:
-        engine.dispose()
+        await engine.dispose()
 
 
 mcp = FastMCP("PgSQL MCP Server", lifespan=app_lifespan)
 
 
 @mcp.tool()
-def get_schema_names(ctx: Context) -> str:
+async def get_schema_names(ctx: Context) -> str:
     """Get all schema names."""
     engine = ctx.request_context.lifespan_context.engine
-    inspector = inspect(engine)
 
-    schema_names = inspector.get_schema_names()
-    if not inspector.get_schema_names():
+    async with engine.connect() as connection:
+        schema_names = await connection.run_sync(
+            lambda sync_conn: inspect(sync_conn).get_schema_names()
+        )
+    if not schema_names:
         return "No schemas found."
     else:
         return f"All schemas: {', '.join(schema_names)}"
 
 
 @mcp.tool()
-def get_tables(ctx: Context, schema_name: Optional[str] = "public") -> str:
+async def get_tables(ctx: Context, schema_name: Optional[str] = "public") -> str:
     """Get all tables in a schema.
 
     Args:
@@ -52,9 +59,11 @@ def get_tables(ctx: Context, schema_name: Optional[str] = "public") -> str:
     try:
         schema_name = schema_name or "public"
         engine = ctx.request_context.lifespan_context.engine
-        inspector = inspect(engine)
 
-        table_names = inspector.get_table_names(schema=schema_name)
+        async with engine.connect() as connection:
+            table_names = await connection.run_sync(
+                lambda sync_conn: inspect(sync_conn).get_table_names(schema=schema_name)
+            )
         if table_names:
             return f"All tables from schema {schema_name}: {', '.join(table_names)}"
         else:
@@ -65,7 +74,7 @@ def get_tables(ctx: Context, schema_name: Optional[str] = "public") -> str:
 
 
 @mcp.tool()
-def get_columns(ctx: Context, table: str, schema_name: Optional[str] = "public") -> str:
+async def get_columns(ctx: Context, table: str, schema_name: Optional[str] = "public") -> str:
     """Get all columns in a table.
 
     Args:
@@ -75,8 +84,10 @@ def get_columns(ctx: Context, table: str, schema_name: Optional[str] = "public")
     try:
         schema_name = schema_name or "public"
         engine = ctx.request_context.lifespan_context.engine
-        inspector = inspect(engine)
-        columns = inspector.get_columns(table, schema=schema_name)
+        async with engine.connect() as connection:
+            columns = await connection.run_sync(
+                lambda sync_conn: inspect(sync_conn).get_columns(table, schema=schema_name)
+            )
 
         if not columns:
             return "No columns found in table."
@@ -88,7 +99,7 @@ def get_columns(ctx: Context, table: str, schema_name: Optional[str] = "public")
 
 
 @mcp.tool()
-def get_indexes(ctx: Context, table: str, schema_name: Optional[str] = "public") -> str:
+async def get_indexes(ctx: Context, table: str, schema_name: Optional[str] = "public") -> str:
     """Get all indexes in a table.
 
     Args:
@@ -98,8 +109,11 @@ def get_indexes(ctx: Context, table: str, schema_name: Optional[str] = "public")
     try:
         schema_name = schema_name or "public"
         engine = ctx.request_context.lifespan_context.engine
-        inspector = inspect(engine)
-        indexes = inspector.get_indexes(table, schema=schema_name)
+
+        async with engine.connect() as connection:
+            indexes = await connection.run_sync(
+                lambda sync_conn: inspect(sync_conn).get_indexes(table, schema=schema_name)
+            )
 
         if not indexes:
             return "No indexes found in table."
@@ -111,77 +125,77 @@ def get_indexes(ctx: Context, table: str, schema_name: Optional[str] = "public")
 
 
 @mcp.tool()
-def run_dql_query(ctx: Context, raw_dql_sql: str) -> str:
+async def run_dql_query(ctx: Context, raw_dql_sql: str) -> str:
     """Run a raw DQL SQL query, like SELECT, SHOW, DESCRIBE, EXPLAIN, etc.
 
     Args:
         raw_dql_sql: The raw DQL SQL query to run.
     """
     engine = ctx.request_context.lifespan_context.engine
-    with Session(engine) as session:
+    async with AsyncSession(engine) as session:
         raw_sql_select = text(raw_dql_sql)
-        result: Result = session.execute(raw_sql_select)
+        result: Result = await session.execute(raw_sql_select)
         rows = result.fetchall()
         return str(rows)
 
 
 @mcp.tool()
-def run_ddl_query(ctx: Context, raw_ddl_sql: str) -> str:
+async def run_ddl_query(ctx: Context, raw_ddl_sql: str) -> str:
     """Run a raw DDL SQL query, like CREATE, ALTER, DROP, etc.
     Args:
         raw_ddl_sql: The raw DDL SQL query to run.
     """
     engine = ctx.request_context.lifespan_context.engine
-    with Session(engine) as session:
+    async with AsyncSession(engine) as session:
         try:
-            session.execute(text(raw_ddl_sql))
-            session.commit()
+            await session.execute(text(raw_ddl_sql))
+            await session.commit()
             return "DDL query executed successfully."
         except SQLAlchemyError as e:
-            session.rollback()
+            await session.rollback()
             return f"Error occurred while executing DDL query: {str(e)}"
         except Exception as e:
-            session.rollback()
+            await session.rollback()
             return f"Unexpected error occurred while executing DDL query: {str(e)}"
 
 
 @mcp.tool()
-def run_dml_query(ctx: Context, raw_dml_sql: str) -> str:
+async def run_dml_query(ctx: Context, raw_dml_sql: str) -> str:
     """Run a raw DDL query, like INSERT, UPDATE, DELETE, etc.
     Args:
         raw_dml_sql: The raw DDL SQL query to run.
     """
     engine = ctx.request_context.lifespan_context.engine
-    with Session(engine) as session:
+    async with AsyncSession(engine) as session:
         try:
-            result = session.execute(text(raw_dml_sql))
-            session.commit()  # Commit transaction to save changes
+            result = await session.execute(text(raw_dml_sql))
+            await session.commit()  # Commit transaction to save changes
             return f"DML query executed successfully. Affected rows: {result.rowcount}"
         except SQLAlchemyError as e:
-            session.rollback()
+            await session.rollback()
             return f"Error occurred while executing DML query: {str(e)}"
         except Exception as e:
-            session.rollback()
+            await session.rollback()
             return f"Unexpected error occurred while executing DML query: {str(e)}"
 
 
 @mcp.tool()
-def run_dcl_query(ctx: Context, raw_dcl_sql: str) -> str:
+async def run_dcl_query(ctx: Context, raw_dcl_sql: str) -> str:
     """Run a raw DCL SQL query, like GRANT, REVOKE, etc.
     Args:
         raw_dcl_sql: The raw DDL SQL query to run.
     """
     engine = ctx.request_context.lifespan_context.engine
-    with Session(engine) as session:
+    async with AsyncSession(engine) as session:
         try:
-            session.execute(text(raw_dcl_sql))
-            session.commit()
+            await session.execute(text(raw_dcl_sql))
+            await session.commit()
             return "DCL query executed successfully."
         except SQLAlchemyError as e:
-            session.rollback()
+            await session.rollback()
             return f"Error occurred while executing DCL query: {str(e)}"
         except Exception as e:
-            session.rollback()
+            await session.rollback()
             return f"Unexpected error occurred while executing DCL query: {str(e)}"
 
 
