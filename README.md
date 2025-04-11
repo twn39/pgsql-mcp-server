@@ -1,13 +1,16 @@
 
 ## Run MCP Server
 
+![PyPI - Version](https://img.shields.io/pypi/v/pgsql-mcp-server)
+
+
 ```shell
-uvx pgsql-mcp-server --dsn postgresql+asyncpg://postgres:postgres@localhost:5432/db
+uvx pgsql-mcp-server --dsn postgresql://postgres:postgres@localhost:5432/db
 ```
 
 
 ## Preview or debug 
 
 ``` 
-npx @modelcontextprotocol/inspector pgsql-mcp-server --dsn postgresql+psycopg2://postgres:postgres@localhost:5432/db
+npx @modelcontextprotocol/inspector pgsql-mcp-server --dsn postgresql://postgres:postgres@localhost:5432/db
 ```

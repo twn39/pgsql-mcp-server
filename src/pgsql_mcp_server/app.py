@@ -74,7 +74,9 @@ async def get_tables(ctx: Context, schema_name: Optional[str] = "public") -> str
 
 
 @mcp.tool()
-async def get_columns(ctx: Context, table: str, schema_name: Optional[str] = "public") -> str:
+async def get_columns(
+    ctx: Context, table: str, schema_name: Optional[str] = "public"
+) -> str:
     """Get all columns in a table.
 
     Args:
@@ -86,7 +88,9 @@ async def get_columns(ctx: Context, table: str, schema_name: Optional[str] = "pu
         engine = ctx.request_context.lifespan_context.engine
         async with engine.connect() as connection:
             columns = await connection.run_sync(
-                lambda sync_conn: inspect(sync_conn).get_columns(table, schema=schema_name)
+                lambda sync_conn: inspect(sync_conn).get_columns(
+                    table, schema=schema_name
+                )
             )
 
         if not columns:
@@ -99,7 +103,9 @@ async def get_columns(ctx: Context, table: str, schema_name: Optional[str] = "pu
 
 
 @mcp.tool()
-async def get_indexes(ctx: Context, table: str, schema_name: Optional[str] = "public") -> str:
+async def get_indexes(
+    ctx: Context, table: str, schema_name: Optional[str] = "public"
+) -> str:
     """Get all indexes in a table.
 
     Args:
@@ -112,7 +118,9 @@ async def get_indexes(ctx: Context, table: str, schema_name: Optional[str] = "pu
 
         async with engine.connect() as connection:
             indexes = await connection.run_sync(
-                lambda sync_conn: inspect(sync_conn).get_indexes(table, schema=schema_name)
+                lambda sync_conn: inspect(sync_conn).get_indexes(
+                    table, schema=schema_name
+                )
             )
 
         if not indexes:
