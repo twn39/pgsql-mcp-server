@@ -17,6 +17,8 @@ anyio==4.9.0
     # via mcp
     # via sse-starlette
     # via starlette
+async-timeout==5.0.1
+    # via asyncpg
 asyncpg==0.30.0
     # via pgsql-mcp-server
 certifi==2025.1.31
@@ -26,6 +28,8 @@ click==8.1.8
     # via pgsql-mcp-server
     # via typer
     # via uvicorn
+exceptiongroup==1.2.2
+    # via anyio
 greenlet==3.1.1
     # via sqlalchemy
 h11==0.14.0
@@ -83,9 +87,11 @@ typing-extensions==4.13.1
     # via anyio
     # via pydantic
     # via pydantic-core
+    # via rich
     # via sqlalchemy
     # via typer
     # via typing-inspection
+    # via uvicorn
 typing-inspection==0.4.0
     # via pydantic
 uvicorn==0.34.0

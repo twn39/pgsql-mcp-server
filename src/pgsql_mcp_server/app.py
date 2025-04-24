@@ -133,6 +133,35 @@ async def get_indexes(
 
 
 @mcp.tool()
+async def get_foreign_keys(
+    ctx: Context, table: str, schema_name: Optional[str] = "public"
+) -> str:
+    """Get foreign keys in a table.
+
+    Args:
+        table: The name of the table to get foreign keys from.
+        schema_name: The name of the schema to get foreign keys from, defaults to "public".
+    """
+    try:
+        schema_name = schema_name or "public"
+        engine = ctx.request_context.lifespan_context.engine
+
+        async with engine.connect() as connection:
+            foreign_keys = await connection.run_sync(
+                lambda sync_conn: inspect(sync_conn).get_foreign_keys(
+                    table, schema=schema_name
+                )
+            )
+        if foreign_keys:
+            return str(foreign_keys)
+        else:
+            return f"No foreign keys found in table {table}."
+
+    except Exception as e:
+        return f"Error occurred while querying table: {str(e)}"
+
+
+@mcp.tool()
 async def run_dql_query(ctx: Context, raw_dql_sql: str) -> str:
     """Run a raw DQL SQL query, like SELECT, SHOW, DESCRIBE, EXPLAIN, etc.
 
