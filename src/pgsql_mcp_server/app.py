@@ -1,11 +1,12 @@
 import os
 import click
+from sqlmodel import text
+from tabulate import tabulate
 from dataclasses import dataclass
 from mcp.server.fastmcp import FastMCP, Context
 from typing import AsyncIterator, Optional
 from contextlib import asynccontextmanager
 from sqlalchemy.exc import SQLAlchemyError
-from sqlmodel import text
 from sqlalchemy import inspect, Result
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine, AsyncSession
 
@@ -65,7 +66,9 @@ async def get_tables(ctx: Context, schema_name: Optional[str] = "public") -> str
                 lambda sync_conn: inspect(sync_conn).get_table_names(schema=schema_name)
             )
         if table_names:
-            return f"All tables from schema {schema_name}: {', '.join(table_names)}"
+            table_data = [[name] for name in table_names]
+            headers = [f"Tables in schema '{schema_name}'"]
+            return tabulate(table_data, headers=headers, tablefmt="simple")
         else:
             return f"No tables found in schema {schema_name}."
 
@@ -96,7 +99,29 @@ async def get_columns(
         if not columns:
             return "No columns found in table."
         else:
-            return str(columns)
+            headers = [
+                "Name",
+                "Type",
+                "Nullable",
+                "Autoincrement",
+                "Default",
+                "Comment",
+            ]
+            table_data = [
+                [
+                    col.get("name"),
+                    str(col.get("type")),
+                    col.get("nullable"),
+                    col.get("autoincrement"),
+                    col.get("default"),
+                    col.get("comment"),
+                ]
+                for col in columns
+            ]
+            table_title = f"Columns for table '{table}'\n\n"
+            return table_title + tabulate(
+                table_data, headers=headers, tablefmt="simple"
+            )
 
     except Exception as e:
         return f"Error occurred while querying table: {str(e)}"
@@ -126,7 +151,19 @@ async def get_indexes(
         if not indexes:
             return "No indexes found in table."
         else:
-            return str(indexes)
+            headers = ["Name", "Column Names", "Unique"]
+            table_data = [
+                [
+                    idx.get("name"),
+                    ", ".join(idx.get("column_names", [])),
+                    idx.get("unique"),
+                ]
+                for idx in indexes
+            ]
+            table_title = f"Indexes for table '{table}'\n\n"
+            return table_title + tabulate(
+                table_data, headers=headers, tablefmt="simple"
+            )
 
     except Exception as e:
         return f"Error occurred while querying table: {str(e)}"
@@ -153,7 +190,27 @@ async def get_foreign_keys(
                 )
             )
         if foreign_keys:
-            return str(foreign_keys)
+            headers = [
+                "Name",
+                "Constrained Columns",
+                "Referred Schema",
+                "Referred Table",
+                "Referred Columns",
+            ]
+            table_data = [
+                [
+                    fk.get("name"),
+                    ", ".join(fk.get("constrained_columns", [])),
+                    fk.get("referred_schema"),
+                    fk.get("referred_table"),
+                    ", ".join(fk.get("referred_columns", [])),
+                ]
+                for fk in foreign_keys
+            ]
+            table_title = f"Foreign keys for table '{table}'\n\n"
+            return table_title + tabulate(
+                table_data, headers=headers, tablefmt="simple"
+            )
         else:
             return f"No foreign keys found in table {table}."
 
@@ -172,8 +229,12 @@ async def run_dql_query(ctx: Context, raw_dql_sql: str) -> str:
     async with AsyncSession(engine) as session:
         raw_sql_select = text(raw_dql_sql)
         result: Result = await session.execute(raw_sql_select)
+        keys = result.keys()
         rows = result.fetchall()
-        return str(rows)
+        if rows:
+            return tabulate(rows, headers=keys, tablefmt="simple")
+        else:
+            return "Query returned no results."
 
 
 @mcp.tool()
@@ -238,8 +299,7 @@ async def run_dcl_query(ctx: Context, raw_dcl_sql: str) -> str:
 
 @click.command()
 @click.option("--dsn", "-d", type=str, help="Database connection string")
-@click.option("-v", "--verbose", count=True)
-def serve(dsn: str, verbose: bool):
+def serve(dsn: str):
     os.environ["DATABASE_URL"] = dsn
     mcp.run()
 
