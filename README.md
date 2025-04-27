@@ -22,7 +22,7 @@ This project is built on the `FastMCP` framework and leverages the `SQLAlchemy` 
 Ensure you have Python 3.8+ installed. Installation via `uvx` is recommended:
 
 ```bash
-uvx pgsql-mcp-server --dsn "postgresql://user:password@localhost:5432/db"
+uvx pgsql-mcp-server --dsn postgresql://user:password@localhost:5432/db
 ```
 
 ## 🔍 Preview and Debugging
