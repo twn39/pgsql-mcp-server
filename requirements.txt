@@ -12,7 +12,7 @@ async-timeout==5.0.1
     # via asyncpg
 asyncpg==0.30.0
     # via pgsql-mcp-server (pyproject.toml)
-certifi==2025.1.31
+certifi==2025.4.26
     # via
     #   httpcore
     #   httpx
@@ -25,11 +25,12 @@ exceptiongroup==1.2.2
     # via anyio
 greenlet==3.2.1
     # via sqlalchemy
-h11==0.14.0
+h11==0.16.0
     # via
+    #   pgsql-mcp-server (pyproject.toml)
     #   httpcore
     #   uvicorn
-httpcore==1.0.8
+httpcore==1.0.9
     # via httpx
 httpx==0.28.1
     # via
@@ -43,16 +44,16 @@ idna==3.10
     #   httpx
 markdown-it-py==3.0.0
     # via rich
-mcp==1.6.0
+mcp==1.7.1
     # via pgsql-mcp-server (pyproject.toml)
 mdurl==0.1.2
     # via markdown-it-py
-pydantic==2.11.3
+pydantic==2.11.4
     # via
     #   mcp
     #   pydantic-settings
     #   sqlmodel
-pydantic-core==2.33.1
+pydantic-core==2.33.2
     # via pydantic
 pydantic-settings==2.9.1
     # via mcp
@@ -63,6 +64,8 @@ python-dotenv==1.1.0
     #   pgsql-mcp-server (pyproject.toml)
     #   mcp
     #   pydantic-settings
+python-multipart==0.0.20
+    # via mcp
 rich==14.0.0
     # via typer
 shellingham==1.5.4
@@ -75,7 +78,7 @@ sqlalchemy==2.0.40
     #   sqlmodel
 sqlmodel==0.0.24
     # via pgsql-mcp-server (pyproject.toml)
-sse-starlette==2.3.3
+sse-starlette==2.3.4
     # via mcp
 starlette==0.46.2
     # via
@@ -83,7 +86,7 @@ starlette==0.46.2
     #   sse-starlette
 tabulate==0.9.0
     # via pgsql-mcp-server (pyproject.toml)
-typer==0.15.2
+typer==0.15.3
     # via mcp
 typing-extensions==4.13.2
     # via
