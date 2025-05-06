@@ -1,6 +1,7 @@
 # PgSQL MCP Server
 
 [![PyPI - Version](https://img.shields.io/pypi/v/pgsql-mcp-server)](https://pypi.org/project/pgsql-mcp-server/)
+[![Maintainability](https://qlty.sh/badges/c2b49b14-0c09-4a33-b545-52e81a2ccab5/maintainability.svg)](https://qlty.sh/gh/twn39/projects/pgsql-mcp-server)
 
 **A powerful tool server based on the Model Context Protocol (MCP), enabling interaction with PostgreSQL databases via MCP calls.**
 
