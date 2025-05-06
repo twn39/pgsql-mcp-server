@@ -8,14 +8,13 @@
 
 ## 🚀 Overview
 
-
 This project is built on the `FastMCP` framework and leverages the `SQLAlchemy` and `asyncpg` libraries to deliver high-performance asynchronous database operations, ensuring efficiency and responsiveness when handling database requests.
 
 ## ✨ Key Features
 
-*   **Asynchronous & Efficient:** Fully asynchronous implementation based on `asyncio`, utilizing `asyncpg` for a high-performance asynchronous PostgreSQL driver.
-*   **Transactional Safety:** DDL, DML, and DCL operations are executed within transactions with error handling and rollback mechanisms.
-*   **Easy Deployment:** Start the server with a simple command line interface.
+- **Asynchronous & Efficient:** Fully asynchronous implementation based on `asyncio`, utilizing `asyncpg` for a high-performance asynchronous PostgreSQL driver.
+- **Transactional Safety:** DDL, DML, and DCL operations are executed within transactions with error handling and rollback mechanisms.
+- **Easy Deployment:** Start the server with a simple command line interface.
 
 ## 📦 Installation
 
