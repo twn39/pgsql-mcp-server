@@ -2,7 +2,7 @@
 #    uv pip compile pyproject.toml
 annotated-types==0.7.0
     # via pydantic
-anyio==4.9.0
+anyio==4.10.0
     # via
     #   httpx
     #   mcp
@@ -16,7 +16,7 @@ attrs==25.3.0
     # via
     #   jsonschema
     #   referencing
-certifi==2025.7.14
+certifi==2025.8.3
     # via
     #   httpcore
     #   httpx
@@ -27,7 +27,7 @@ click==8.2.1
     #   uvicorn
 exceptiongroup==1.3.0
     # via anyio
-greenlet==3.2.3
+greenlet==3.2.4
     # via sqlalchemy
 h11==0.16.0
     # via
@@ -46,13 +46,13 @@ idna==3.10
     # via
     #   anyio
     #   httpx
-jsonschema==4.25.0
+jsonschema==4.25.1
     # via mcp
 jsonschema-specifications==2025.4.1
     # via jsonschema
-markdown-it-py==3.0.0
+markdown-it-py==4.0.0
     # via rich
-mcp==1.12.0
+mcp==1.13.1
     # via pgsql-mcp-server (pyproject.toml)
 mdurl==0.1.2
     # via markdown-it-py
@@ -78,9 +78,9 @@ referencing==0.36.2
     # via
     #   jsonschema
     #   jsonschema-specifications
-rich==14.0.0
+rich==14.1.0
     # via typer
-rpds-py==0.26.0
+rpds-py==0.27.0
     # via
     #   jsonschema
     #   referencing
@@ -88,28 +88,27 @@ shellingham==1.5.4
     # via typer
 sniffio==1.3.1
     # via anyio
-sqlalchemy==2.0.41
+sqlalchemy==2.0.43
     # via
     #   pgsql-mcp-server (pyproject.toml)
     #   sqlmodel
 sqlmodel==0.0.24
     # via pgsql-mcp-server (pyproject.toml)
-sse-starlette==2.4.1
+sse-starlette==3.0.2
     # via mcp
-starlette==0.47.2
+starlette==0.47.3
     # via mcp
 tabulate==0.9.0
     # via pgsql-mcp-server (pyproject.toml)
-typer==0.16.0
+typer==0.16.1
     # via mcp
-typing-extensions==4.14.1
+typing-extensions==4.15.0
     # via
     #   anyio
     #   exceptiongroup
     #   pydantic
     #   pydantic-core
     #   referencing
-    #   rich
     #   sqlalchemy
     #   starlette
     #   typer
