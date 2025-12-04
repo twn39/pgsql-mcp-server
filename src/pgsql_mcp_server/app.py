@@ -301,7 +301,7 @@ async def run_dcl_query(ctx: Context, raw_dcl_sql: str) -> str:
 @click.option("--dsn", "-d", type=str, help="Database connection string")
 def serve(dsn: str):
     os.environ["DATABASE_URL"] = dsn
-    mcp.run()
+    mcp.run(transport='stdio')
 
 
 if __name__ == "__main__":
