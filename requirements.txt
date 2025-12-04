@@ -106,8 +106,10 @@ sqlmodel==0.0.27
     # via pgsql-mcp-server (pyproject.toml)
 sse-starlette==3.0.2
     # via mcp
-starlette==0.47.3
-    # via mcp
+starlette==0.50.0
+    # via
+    #   pgsql-mcp-server (pyproject.toml)
+    #   mcp
 tabulate==0.9.0
     # via pgsql-mcp-server (pyproject.toml)
 typer==0.16.1
