@@ -1,14 +1,15 @@
 import os
+from contextlib import asynccontextmanager
+from dataclasses import dataclass
+from typing import Any, AsyncIterator, Optional, cast
+
 import click
+from mcp.server.fastmcp import Context, FastMCP
+from sqlalchemy import Result, inspect
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlmodel import text
 from tabulate import tabulate
-from dataclasses import dataclass
-from mcp.server.fastmcp import FastMCP, Context
-from typing import AsyncIterator, Optional
-from contextlib import asynccontextmanager
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import inspect, Result
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine, AsyncSession
 
 
 @dataclass
@@ -177,7 +178,8 @@ async def get_foreign_keys(
 
     Args:
         table: The name of the table to get foreign keys from.
-        schema_name: The name of the schema to get foreign keys from, defaults to "public".
+        schema_name: The name of the schema to get foreign keys from,
+            defaults to "public".
     """
     try:
         schema_name = schema_name or "public"
@@ -259,16 +261,17 @@ async def run_ddl_query(ctx: Context, raw_ddl_sql: str) -> str:
 
 @mcp.tool()
 async def run_dml_query(ctx: Context, raw_dml_sql: str) -> str:
-    """Run a raw DDL query, like INSERT, UPDATE, DELETE, etc.
+    """Run a raw DML query, like INSERT, UPDATE, DELETE, etc.
     Args:
-        raw_dml_sql: The raw DDL SQL query to run.
+        raw_dml_sql: The raw DML SQL query to run.
     """
     engine = ctx.request_context.lifespan_context.engine
     async with AsyncSession(engine) as session:
         try:
             result = await session.execute(text(raw_dml_sql))
             await session.commit()  # Commit transaction to save changes
-            return f"DML query executed successfully. Affected rows: {result.rowcount}"
+            rowcount = cast(Any, result).rowcount
+            return f"DML query executed successfully. Affected rows: {rowcount}"
         except SQLAlchemyError as e:
             await session.rollback()
             return f"Error occurred while executing DML query: {str(e)}"
@@ -299,9 +302,10 @@ async def run_dcl_query(ctx: Context, raw_dcl_sql: str) -> str:
 
 @click.command()
 @click.option("--dsn", "-d", type=str, help="Database connection string")
-def serve(dsn: str):
-    os.environ["DATABASE_URL"] = dsn
-    mcp.run(transport='stdio')
+def serve(dsn: Optional[str] = None):
+    if dsn:
+        os.environ["DATABASE_URL"] = dsn
+    mcp.run(transport="stdio")
 
 
 if __name__ == "__main__":

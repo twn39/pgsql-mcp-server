@@ -38,6 +38,26 @@ npx @modelcontextprotocol/inspector uvx pgsql-mcp-server --dsn "postgresql://use
 
 这将会启动一个本地 Web 服务。在浏览器中打开提供的 URL 即可开始调试。
 
+## 🧪 测试
+
+本项目使用 `pytest` 进行测试。
+
+### 运行所有测试
+```bash
+uv run pytest
+```
+
+### 仅运行单元测试
+```bash
+uv run pytest tests/test_app.py
+```
+
+### 仅运行集成测试
+集成测试需要本地 PostgreSQL 实例。默认连接地址为 `localhost:5432/postgres`。
+```bash
+uv run pytest tests/test_integration.py
+```
+
 ## 🤝 贡献代码
 
 欢迎贡献代码！如果您有任何改进建议、功能请求或发现任何错误，请随时：

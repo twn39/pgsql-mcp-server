@@ -38,6 +38,26 @@ npx @modelcontextprotocol/inspector uvx pgsql-mcp-server --dsn "postgresql://use
 
 This will start a local web service. Open the provided URL in your browser to begin debugging.
 
+## 🧪 Testing
+
+This project uses `pytest` for testing.
+
+### Run all tests
+```bash
+uv run pytest
+```
+
+### Run unit tests only
+```bash
+uv run pytest tests/test_app.py
+```
+
+### Run integration tests only
+Integration tests require a local PostgreSQL instance. They default to `localhost:5432/postgres`.
+```bash
+uv run pytest tests/test_integration.py
+```
+
 ## 🤝 Contributing
 
 Contributions are welcome! If you have suggestions for improvements, feature requests, or find any bugs, please feel free to:
