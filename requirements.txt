@@ -82,7 +82,7 @@ python-dotenv==1.2.1
     #   pgsql-mcp-server (pyproject.toml)
     #   mcp
     #   pydantic-settings
-python-multipart==0.0.20
+python-multipart==0.0.22
     # via mcp
 referencing==0.36.2
     # via
