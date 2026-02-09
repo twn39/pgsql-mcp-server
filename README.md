@@ -22,11 +22,44 @@ This project is built on the `FastMCP` framework and leverages the `SQLAlchemy` 
 
 ## 📦 Installation
 
-Ensure you have Python 3.8+ installed. Installation via `uvx` is recommended:
+Ensure you have Python 3.10+ installed. Recommendation:
+
+### Using uv (Recommended)
 
 ```bash
-uvx pgsql-mcp-server --dsn postgresql://user:password@localhost:5432/db
+uv tool install pgsql-mcp-server
 ```
+
+Then run it:
+```bash
+pgsql-mcp-server --dsn "postgresql://user:password@localhost:5432/db"
+```
+
+Or run directly without installation:
+```bash
+uvx pgsql-mcp-server --dsn "postgresql://user:password@localhost:5432/db"
+```
+
+### Using pip
+
+```bash
+pip install pgsql-mcp-server
+```
+
+## 🛠️ Available Tools
+
+The server provides the following tools for database interaction:
+
+- **`get_schema_names`**: List all schemas in the database.
+- **`get_tables`**: List all tables in a specific schema (defaults to `public`).
+- **`get_columns`**: Get detailed column information for a specific table.
+- **`get_indexes`**: Get index details for a specific table.
+- **`get_foreign_keys`**: Get foreign key constraints for a specific table.
+- **`run_dql_query`**: Execute Data Query Language (DQL) statements like `SELECT`, `SHOW`, `EXPLAIN`.
+- **`run_dml_query`**: Execute Data Manipulation Language (DML) statements like `INSERT`, `UPDATE`, `DELETE`.
+- **`run_ddl_query`**: Execute Data Definition Language (DDL) statements like `CREATE`, `ALTER`, `DROP`.
+- **`run_dcl_query`**: Execute Data Control Language (DCL) statements like `GRANT`, `REVOKE`.
+
 
 ## 🔍 Preview and Debugging
 

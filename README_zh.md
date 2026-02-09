@@ -22,11 +22,44 @@
 
 ## 📦 安装
 
-确保您已安装 Python 3.8+。推荐通过 `uvx` 安装：
+确保您已安装 Python 3.10+。推荐方式：
+
+### 使用 uv (推荐)
 
 ```bash
-uvx pgsql-mcp-server --dsn postgresql://user:password@localhost:5432/db
+uv tool install pgsql-mcp-server
 ```
+
+然后运行：
+```bash
+pgsql-mcp-server --dsn "postgresql://user:password@localhost:5432/db"
+```
+
+或者不安装直接运行：
+```bash
+uvx pgsql-mcp-server --dsn "postgresql://user:password@localhost:5432/db"
+```
+
+### 使用 pip
+
+```bash
+pip install pgsql-mcp-server
+```
+
+## 🛠️ 可用工具
+
+该服务器提供以下工具用于数据库交互：
+
+- **`get_schema_names`**: 列出数据库中的所有模式。
+- **`get_tables`**: 列出特定模式中的所有表（默认为 `public`）。
+- **`get_columns`**: 获取特定表的详细列信息。
+- **`get_indexes`**: 获取特定表的索引详情。
+- **`get_foreign_keys`**: 获取特定表的外键约束。
+- **`run_dql_query`**: 执行数据查询语言 (DQL) 语句，如 `SELECT`, `SHOW`, `EXPLAIN`。
+- **`run_dml_query`**: 执行数据操作语言 (DML) 语句，如 `INSERT`, `UPDATE`, `DELETE`。
+- **`run_ddl_query`**: 执行数据定义语言 (DDL) 语句，如 `CREATE`, `ALTER`, `DROP`。
+- **`run_dcl_query`**: 执行数据控制语言 (DCL) 语句，如 `GRANT`, `REVOKE`。
+
 
 ## 🔍 预览与调试
 
