@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/twn39-pgsql-mcp-server-badge.png)](https://mseep.ai/app/twn39-pgsql-mcp-server)
+
 # PgSQL MCP Server
 
 [![PyPI - Version](https://img.shields.io/pypi/v/pgsql-mcp-server)](https://pypi.org/project/pgsql-mcp-server/)
