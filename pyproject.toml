@@ -1,6 +1,6 @@
 [project]
 name = "pgsql-mcp-server"
-version = "1.4.5"
+version = "1.4.6"
 description = "PostgreSQL MCP Server"
 readme = "README.md"
 requires-python = ">=3.10,<3.15"
@@ -37,6 +37,7 @@ dependencies = [
     "h11>=0.16.0",
     "starlette>=0.52.1",
     "python-multipart>=0.0.22",
+    "cryptography>=46.0.5",
 ]
 
 [project.urls]
